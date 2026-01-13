@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, NavLink } from 'react-router-dom';
+import { Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import MonthCalendar from './MonthCalendar';
 
 const months = [
@@ -22,6 +22,30 @@ const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 function Calendar() {
   const [currentYear] = useState(new Date().getFullYear());
   const [hoveredMonth, setHoveredMonth] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Get current month index based on current route
+  const getCurrentMonthIndex = () => {
+    const currentPath = location.pathname;
+    const monthIndex = months.findIndex(month => month.path === currentPath);
+    return monthIndex === -1 ? 0 : monthIndex;
+  };
+
+  const currentMonthIndex = getCurrentMonthIndex();
+
+  const handlePrevMonth = () => {
+    const prevIndex = (currentMonthIndex - 1 + months.length) % months.length;
+    navigate(months[prevIndex].path);
+  };
+
+  const handleNextMonth = () => {
+    const nextIndex = (currentMonthIndex + 1) % months.length;
+    navigate(months[nextIndex].path);
+  };
+
+  // Get current month object
+  const currentMonth = months[currentMonthIndex] || months[0];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-sans p-4 md:p-6 lg:p-8">
@@ -44,9 +68,37 @@ function Calendar() {
           </div>
         </div>
 
-
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
           <div className="p-6 md:p-8">
+            {/* Month Header with Navigation Buttons */}
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-800">{currentMonth.name} {currentYear}</h2>
+                <div className="flex items-center mt-2">
+                  <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${currentMonth.color} mr-2`}></div>
+                  <span className="text-gray-600">{currentMonth.days} days</span>
+                </div>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                  onClick={handlePrevMonth}
+                >
+                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                  onClick={handleNextMonth}
+                >
+                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
             <div className="relative">
               <Routes>
                 {months.map((month) => (
@@ -54,46 +106,20 @@ function Calendar() {
                     key={month.path}
                     path={month.path}
                     element={
-                      <>
-                        <div className="flex items-center justify-between mb-8">
-                          <div>
-                            <h2 className="text-3xl font-bold text-gray-800">{month.name} {currentYear}</h2>
-                            <div className="flex items-center mt-2">
-                              <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${month.color} mr-2`}></div>
-                              <span className="text-gray-600">{month.days} days</span>
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                              </svg>
-                            </button>
-                            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-
-                        
-                        
-                        <MonthCalendar
-                          name={month.name}
-                          days={daysOfWeek}
-                          totalDays={month.days}
-                          theme={{
-                            headerText: 'text-gray-600 font-semibold uppercase text-sm',
-                            dayCell: 'p-4 rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer relative group',
-                            weekend: 'text-red-500 font-semibold',
-                            today: 'bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200',
-                            regularDay: 'text-gray-700 hover:bg-gray-50',
-                            monthColor: month.color,
-                          }}
-                          year={currentYear}
-                        />
-                      </>
+                      <MonthCalendar
+                        name={month.name}
+                        days={daysOfWeek}
+                        totalDays={month.days}
+                        theme={{
+                          headerText: 'text-gray-600 font-semibold uppercase text-sm',
+                          dayCell: 'p-4 rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer relative group',
+                          weekend: 'text-red-500 font-semibold',
+                          today: 'bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200',
+                          regularDay: 'text-gray-700 hover:bg-gray-50',
+                          monthColor: month.color,
+                        }}
+                        year={currentYear}
+                      />
                     }
                   />
                 ))}
@@ -101,33 +127,33 @@ function Calendar() {
             </div>
           </div>
           
-        <div className="m-15">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Select Month</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {months.map((month, index) => (
-              <NavLink
-                key={month.path}
-                to={month.path}
-                className={({ isActive }) =>
-                  `group relative overflow-hidden rounded-xl p-4 transition-all duration-300 transform hover:-translate-y-1 ${
-                    isActive
-                      ? `bg-gradient-to-r ${month.color} text-white shadow-xl scale-105`
-                      : 'bg-white text-gray-700 hover:shadow-lg'
-                  }`
-                }
-                onMouseEnter={() => setHoveredMonth(month.path)}
-                onMouseLeave={() => setHoveredMonth(null)}
-              >
-                <div className="relative z-10">
-                  <div className="text-2xl font-bold mb-1">{String(index + 1).padStart(2, '0')}</div>
-                  <div className="font-semibold">{month.name}</div>
-                  <div className="text-sm opacity-80 mt-1">{month.days} days</div>
-                </div>
-                <div className={`absolute inset-0 bg-gradient-to-r ${month.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
-              </NavLink>
-            ))}
+          <div className="m-6">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Select Month</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {months.map((month, index) => (
+                <NavLink
+                  key={month.path}
+                  to={month.path}
+                  className={({ isActive }) =>
+                    `group relative overflow-hidden rounded-xl p-4 transition-all duration-300 transform hover:-translate-y-1 ${
+                      isActive
+                        ? `bg-gradient-to-r ${month.color} text-white shadow-xl scale-105`
+                        : 'bg-white text-gray-700 hover:shadow-lg'
+                    }`
+                  }
+                  onMouseEnter={() => setHoveredMonth(month.path)}
+                  onMouseLeave={() => setHoveredMonth(null)}
+                >
+                  <div className="relative z-10">
+                    <div className="text-2xl font-bold mb-1">{String(index + 1).padStart(2, '0')}</div>
+                    <div className="font-semibold">{month.name}</div>
+                    <div className="text-sm opacity-80 mt-1">{month.days} days</div>
+                  </div>
+                  <div className={`absolute inset-0 bg-gradient-to-r ${month.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+                </NavLink>
+              ))}
+            </div>
           </div>
-        </div>
           
           <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
             <div className="flex items-center justify-between text-sm text-gray-600">
