@@ -25,7 +25,6 @@ function Calendar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Get current month index based on current route
   const getCurrentMonthIndex = () => {
     const currentPath = location.pathname;
     const monthIndex = months.findIndex(month => month.path === currentPath);
@@ -44,7 +43,6 @@ function Calendar() {
     navigate(months[nextIndex].path);
   };
 
-  // Get current month object
   const currentMonth = months[currentMonthIndex] || months[0];
 
   return (
@@ -70,7 +68,6 @@ function Calendar() {
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
           <div className="p-6 md:p-8">
-            {/* Month Header with Navigation Buttons */}
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-bold text-gray-800">{currentMonth.name} {currentYear}</h2>
@@ -114,8 +111,8 @@ function Calendar() {
                           headerText: 'text-gray-600 font-semibold uppercase text-sm',
                           dayCell: 'p-4 rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer relative group',
                           weekend: 'text-red-500 font-semibold',
-                          today: 'bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200',
-                          regularDay: 'text-gray-700 hover:bg-gray-50',
+                          today: 'bg-gradient-to-r from-blue-200 to-cyan-100 border-2 border-blue-200',
+                          regularDay: 'text-gray-700 hover:bg-gray-300',
                           monthColor: month.color,
                         }}
                         year={currentYear}
