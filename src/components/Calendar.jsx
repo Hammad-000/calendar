@@ -1,23 +1,29 @@
 import React, { useState } from 'react';
-import { Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, NavLink, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import MonthCalendar from './MonthCalendar';
 
 const months = [
-  { name: 'January', path: '/january', days: 31, color: 'from-blue-400 to-cyan-400' },
-  { name: 'February', path: '/february', days: 28, color: 'from-pink-400 to-rose-400' },
-  { name: 'March', path: '/march', days: 31, color: 'from-green-400 to-emerald-400' },
-  { name: 'April', path: '/april', days: 30, color: 'from-purple-400 to-violet-400' },
-  { name: 'May', path: '/may', days: 31, color: 'from-yellow-400 to-orange-400' },
-  { name: 'June', path: '/june', days: 30, color: 'from-red-400 to-pink-400' },
-  { name: 'July', path: '/july', days: 31, color: 'from-blue-500 to-indigo-500' },
-  { name: 'August', path: '/august', days: 31, color: 'from-teal-400 to-cyan-500' },
-  { name: 'September', path: '/september', days: 30, color: 'from-amber-400 to-orange-400' },
-  { name: 'October', path: '/october', days: 31, color: 'from-purple-500 to-pink-500' },
-  { name: 'November', path: '/november', days: 30, color: 'from-brown-400 to-amber-600' },
-  { name: 'December', path: '/december', days: 31, color: 'from-sky-400 to-blue-500' },
+  { name: 'January', path: 'january', days: 31, color: 'from-blue-400 to-cyan-400' },
+  { name: 'February', path: 'february', days: 28, color: 'from-pink-400 to-rose-400' },
+  { name: 'March', path: 'march', days: 31, color: 'from-green-400 to-emerald-400' },
+  { name: 'April', path: 'april', days: 30, color: 'from-purple-400 to-violet-400' },
+  { name: 'May', path: 'may', days: 31, color: 'from-yellow-400 to-orange-400' },
+  { name: 'June', path: 'june', days: 30, color: 'from-red-400 to-pink-400' },
+  { name: 'July', path: 'july', days: 31, color: 'from-blue-500 to-indigo-500' },
+  { name: 'August', path: 'august', days: 31, color: 'from-teal-400 to-cyan-500' },
+  { name: 'September', path: 'september', days: 30, color: 'from-amber-400 to-orange-400' },
+  { name: 'October', path: 'october', days: 31, color: 'from-purple-500 to-pink-500' },
+  { name: 'November', path: 'november', days: 30, color: 'from-brown-400 to-amber-600' },
+  { name: 'December', path: 'december', days: 31, color: 'from-sky-400 to-blue-500' },
 ];
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const getCurrentMonthPath = () => {
+  return months[new Date().getMonth()].path;
+};
+
+// console.log(getCurrentMonthPath)
 
 function Calendar() {
   const [currentYear] = useState(new Date().getFullYear());
@@ -26,9 +32,11 @@ function Calendar() {
   const navigate = useNavigate();
 
   const getCurrentMonthIndex = () => {
-    const currentPath = location.pathname;
-    const monthIndex = months.findIndex(month => month.path === currentPath);
-    return monthIndex === -1 ? 0 : monthIndex;
+    const index = months.findIndex(month =>
+      location.pathname.endsWith(month.path)
+    );
+
+    return index === -1 ? new Date().getMonth() : index;
   };
 
   const currentMonthIndex = getCurrentMonthIndex();
@@ -43,6 +51,7 @@ function Calendar() {
     navigate(months[nextIndex].path);
   };
 
+
   const currentMonth = months[currentMonthIndex] || months[0];
 
   return (
@@ -55,7 +64,7 @@ function Calendar() {
             </h1>
             <p className="text-gray-600 text-lg">Navigate through months and track your days</p>
           </div>
-          
+
           <div className="mt-4 md:mt-0">
             <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-sm">
               <svg className="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,6 +107,12 @@ function Calendar() {
 
             <div className="relative">
               <Routes>
+
+                <Route
+                  index
+                  element={<Navigate to={getCurrentMonthPath()} replace />}
+                />
+
                 {months.map((month) => (
                   <Route
                     key={month.path}
@@ -123,7 +138,7 @@ function Calendar() {
               </Routes>
             </div>
           </div>
-          
+
           <div className="m-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-4">Select Month</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -132,10 +147,9 @@ function Calendar() {
                   key={month.path}
                   to={month.path}
                   className={({ isActive }) =>
-                    `group relative overflow-hidden rounded-xl p-4 transition-all duration-300 transform hover:-translate-y-1 ${
-                      isActive
-                        ? `bg-gradient-to-r ${month.color} text-white shadow-xl scale-105`
-                        : 'bg-white text-gray-700 hover:shadow-lg'
+                    `group relative overflow-hidden rounded-xl p-4 transition-all duration-300 transform hover:-translate-y-1 ${isActive
+                      ? `bg-gradient-to-r ${month.color} text-white shadow-xl scale-105`
+                      : 'bg-white text-gray-700 hover:shadow-lg'
                     }`
                   }
                   onMouseEnter={() => setHoveredMonth(month.path)}
@@ -151,7 +165,7 @@ function Calendar() {
               ))}
             </div>
           </div>
-          
+
           <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
             <div className="flex items-center justify-between text-sm text-gray-600">
               <div className="flex items-center space-x-4">
